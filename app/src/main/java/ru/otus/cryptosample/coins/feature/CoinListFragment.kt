@@ -11,14 +11,18 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
 import ru.otus.cryptosample.CoinsSampleApp
-import ru.otus.cryptosample.coins.feature.adapter.CoinsAdapter
+import ru.otus.cryptosample.coins.feature.adapter.CoinsAdapterItem
+import ru.otus.cryptosample.coins.feature.adapter.CoinsListAdapter
+import ru.otus.cryptosample.coins.feature.adapter.ItemAnimator
 import ru.otus.cryptosample.coins.feature.di.DaggerCoinListComponent
 import ru.otus.cryptosample.databinding.FragmentCoinListBinding
 import javax.inject.Inject
 
 class CoinListFragment : Fragment() {
+    private val sharedPool = RecyclerView.RecycledViewPool()
 
     private var _binding: FragmentCoinListBinding? = null
     private val binding get() = _binding!!
@@ -28,7 +32,7 @@ class CoinListFragment : Fragment() {
 
     private val viewModel: CoinListViewModel by viewModels { factory }
 
-    private lateinit var coinsAdapter: CoinsAdapter
+    private lateinit var coinsAdapter: CoinsListAdapter
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -59,7 +63,7 @@ class CoinListFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        coinsAdapter = CoinsAdapter()
+        coinsAdapter = CoinsListAdapter(sharedPool)
 
         val gridLayoutManager = GridLayoutManager(requireContext(), 2)
         gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
@@ -67,12 +71,14 @@ class CoinListFragment : Fragment() {
                 return when (coinsAdapter.getItemViewType(position)) {
                     0 -> 2 // Category header spans full width
                     1 -> 1 // Coin item spans half width
+                    2 -> 2 // Horizontal items position
                     else -> 1
                 }
             }
         }
 
         binding.recyclerView.apply {
+            itemAnimator = ItemAnimator()
             layoutManager = gridLayoutManager
             adapter = coinsAdapter
         }
@@ -98,8 +104,8 @@ class CoinListFragment : Fragment() {
         }
     }
 
-    private fun renderState(state: CoinsScreenState) {
-        coinsAdapter.setData(state.categories)
+    private fun renderState(categories: List<CoinsAdapterItem>) {
+        coinsAdapter.submitList(categories)
     }
 
     override fun onDestroyView() {

@@ -5,4 +5,5 @@ import ru.otus.cryptosample.coins.feature.CoinState
 sealed class CoinsAdapterItem {
     data class CategoryHeader(val categoryName: String) : CoinsAdapterItem()
     data class CoinItem(val coin: CoinState) : CoinsAdapterItem()
+    data class HorizontalCategory(val id: String, val coinItems: List<CoinItem>): CoinsAdapterItem()
 }

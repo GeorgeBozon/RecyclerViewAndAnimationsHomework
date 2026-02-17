@@ -11,14 +11,17 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import ru.otus.cryptosample.coins.domain.ConsumeCoinsUseCase
+import ru.otus.cryptosample.coins.feature.adapter.CoinsAdapterItem
+import ru.otus.cryptosample.coins.feature.mapper.CategoriesToAdapterItemMapper
 
 class CoinListViewModel(
     private val consumeCoinsUseCase: ConsumeCoinsUseCase,
     private val coinsStateFactory: CoinsStateFactory,
+    private val mapper: CategoriesToAdapterItemMapper
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(CoinsScreenState())
-    val state: StateFlow<CoinsScreenState> = _state.asStateFlow()
+    private val _state = MutableStateFlow(mapper.map(CoinsScreenState().categories))
+    val state: StateFlow<List<CoinsAdapterItem>> = _state.asStateFlow()
 
     private var fullCategories: List<CoinCategoryState> = emptyList()
     private var highlightMovers = false
@@ -68,6 +71,6 @@ class CoinListViewModel(
             })
         }
 
-        _state.update { it.copy(categories = processedCategories) }
+        _state.update { mapper.map(processedCategories) }
     }
 }

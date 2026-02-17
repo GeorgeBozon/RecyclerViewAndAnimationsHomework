@@ -5,12 +5,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
 import ru.otus.common.di.FeatureScope
 import ru.otus.cryptosample.coins.domain.ConsumeCoinsUseCase
+import ru.otus.cryptosample.coins.feature.mapper.CategoriesToAdapterItemMapper
 import javax.inject.Inject
 
 @FeatureScope
 class CoinListViewModelFactory @Inject constructor(
     private val consumeCoinsUseCase: ConsumeCoinsUseCase,
     private val coinsStateFactory: CoinsStateFactory,
+    private val mapper: CategoriesToAdapterItemMapper
 ) :
     ViewModelProvider.Factory {
 
@@ -24,6 +26,7 @@ class CoinListViewModelFactory @Inject constructor(
                 return CoinListViewModel(
                     consumeCoinsUseCase = consumeCoinsUseCase,
                     coinsStateFactory = coinsStateFactory,
+                    mapper = mapper
                 ) as T
             }
         }
